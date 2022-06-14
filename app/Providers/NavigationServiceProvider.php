@@ -45,7 +45,13 @@ class NavigationServiceProvider extends ServiceProvider
 
             if (Auth::check()) {
                 $auth_user = tb_sys_mf_user::findOrFail(Auth::id());
-                $results = DB::select('call sp_call_mod_user_access(?)', array($auth_user->id));
+                
+                if(env('DB_CONNECTION') == "sqlsrv"){
+                    $results = DB::select('exec sp_call_mod_user_access @user_id = ?', array($auth_user->id));
+                }
+                else{
+                    $results = DB::select('call sp_call_mod_user_access(?)', array($auth_user->id));
+                }
 
 
                 foreach($results as $result) {

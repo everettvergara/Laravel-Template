@@ -132,8 +132,6 @@
             </button>
         </form>
     </div>
-    @errors
-    @enderrors
 </div>
 @endsection
 

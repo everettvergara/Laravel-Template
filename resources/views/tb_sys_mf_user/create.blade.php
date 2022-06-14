@@ -105,8 +105,6 @@
                 </button>
                    
             </form>
-            @errors()
-            @enderrors
         </div>
         
 </div>
