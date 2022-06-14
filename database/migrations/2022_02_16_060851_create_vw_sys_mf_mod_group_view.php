@@ -64,7 +64,7 @@ class CreateVwSysMfModGroupView extends Migration
                                 a.name AS ref_mod_name,
                                 1 AS level,
                                 cast(a.seq as char charset utf8mb4) AS seq 
-                        from	laravel_demo.tb_sys_mf_mod_group a 
+                        from	tb_sys_mf_mod_group a 
                         where 	(a.ref_mod_id is null) 
                         
                         union 
@@ -77,7 +77,7 @@ class CreateVwSysMfModGroupView extends Migration
                                 (b.level + 1) AS level,
                                 concat(cast(b.seq as char charset utf8mb4),
                                 cast(a.seq as char charset utf8mb4)) AS seq 
-                        from	(laravel_demo.tb_sys_mf_mod_group a 
+                        from	(tb_sys_mf_mod_group a 
                                 join mod_group b on((a.ref_mod_id = b.mod_group_id)))) 
                         
                         select	mod_group.mod_group_id AS mod_group_id,
