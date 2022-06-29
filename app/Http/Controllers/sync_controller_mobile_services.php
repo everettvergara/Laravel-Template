@@ -9,9 +9,9 @@ class sync_controller_mobile_services extends Controller
 {
     public function create(Request $r)
     {
-        $auth = new authentication_controller();
-        if(!$auth->check_token($r->user_code, $r->device_imei, $r->token))
-            return $auth->auth_fail_error();
+        // $auth = new authentication_controller();
+        // if(!$auth->check_token($r->user_code, $r->device_imei, $r->token))
+        //     return $auth->auth_fail_error();
 
         try {
             foreach($r->data as $key => $datum){
@@ -42,17 +42,15 @@ class sync_controller_mobile_services extends Controller
     }
 
     public function retrieve_all_date_range(Request $r){
-        $auth = new authentication_controller();
-        if(!$auth->check_token($r->user_code, $r->device_imei, $r->token))
-            return $auth->auth_fail_error();
+        // $auth = new authentication_controller();
+        // if(!$auth->check_token($r->user_code, $r->device_imei, $r->token))
+        //     return $auth->auth_fail_error();
 
         try {
-            $date_from = date('Y-m-d', strtotime($r->date_from));
-            $date_to = date('Y-m-d', strtotime($r->date_to));
-            $period = CarbonPeriod::create($date_from, $date_to);
+            $period = CarbonPeriod::create(date('Y-m-d', strtotime($r->date_from)), date('Y-m-d', strtotime($r->date_to)));
             $date_range = $period->toArray();
-            $result = '';
-            $result .= "[";
+            $output = '';
+            $output .= "[";
 
             foreach ($date_range as $date_key => $date){
                 $year = date_format($date, 'Y');
@@ -64,19 +62,19 @@ class sync_controller_mobile_services extends Controller
                     foreach($users as $user){
                         $file = $dir."/".$user."/services.json";
                         if(file_exists($file)){
-                            if($date_key !== array_key_first($date_range)){
-                                $result .= ",\r\n";
+                            if ($output != "[") {
+                                $output .= ",\r\n";
                             }
-                            $result .= file_get_contents($file);
+                            $output .= file_get_contents($file);
                         }
                     }
                 }
             }
             
-            $result .= "]";
+            $output .= "]"; 
             return json_encode([
                 'status' => 'Success',
-                'data'  => $result
+                'data'  => $output
             ]);
         } catch (\Throwable $th) {
             return $this->transaction_failed_error($th->getMessage());
@@ -84,36 +82,35 @@ class sync_controller_mobile_services extends Controller
     }
 
     public function retrieve_user_date_range(Request $r){
-        $auth = new authentication_controller();
-        if(!$auth->check_token($r->user_code, $r->device_imei, $r->token))
-            return $auth->auth_fail_error();
+        // $auth = new authentication_controller();
+        // if(!$auth->check_token($r->user_code, $r->device_imei, $r->token))
+        //     return $auth->auth_fail_error();
 
         try {
-            $date_from = date('Y-m-d', strtotime($r->date_from));
-            $date_to = date('Y-m-d', strtotime($r->date_to));
-            $period = CarbonPeriod::create($date_from, $date_to);
-            $date_range = $period->toArray();
-            $result = '';
-            $result .= "[";
 
+            $period = CarbonPeriod::create(date('Y-m-d', strtotime($r->date_from)), date('Y-m-d', strtotime($r->date_to)));
+            $date_range = $period->toArray();
+            $output = '';
+            $output .= "[";
             foreach ($date_range as $date_key => $date){
+
                 $year = date_format($date, 'Y');
                 $month = date_format($date, 'm');
                 $day = date_format($date, 'd');
                 $dir = "Mobile-Services/".$year."/".$month."/".$day.'/'.$r->user_code;
                 $file = $dir."/services.json";
                 if(file_exists($file)){
-                    if($date_key !== array_key_first($date_range)){
-                        $result .= ",\r\n";
+
+                    if ($output != "[") {
+                        $output .= ",\r\n";
                     }
-                    $result .= file_get_contents($file);
+                    $output .= file_get_contents($file);
                 }
             }
-
-            $result .= "]";
+            $output .= "]"; 
             return json_encode([
                 'status' => 'Success',
-                'data'  => $result
+                'data'   => $output
             ]);
         } catch (\Throwable $th) {
             return $this->transaction_failed_error($th->getMessage());
@@ -121,13 +118,13 @@ class sync_controller_mobile_services extends Controller
     }
 
     public function retrieve_user_date(Request $r){
-        $auth = new authentication_controller();
-        if(!$auth->check_token($r->user_code, $r->device_imei, $r->token))
-            return $auth->auth_fail_error();
+        // $auth = new authentication_controller();
+        // if(!$auth->check_token($r->user_code, $r->device_imei, $r->token))
+        //     return $auth->auth_fail_error();
 
         try {
-            $result = '';
-            $result .= "[";
+            $output = '';
+            $output .= "[";
             $year = date('Y', strtotime($r->date));
             $month = date('m', strtotime($r->date));
             $day = date('d', strtotime($r->date));
@@ -135,13 +132,13 @@ class sync_controller_mobile_services extends Controller
             $dir = "Mobile-Services/".$year."/".$month."/".$day.'/'.$r->user_code;
             $file = $dir."/services.json";
             if(file_exists($file)){
-                $result .= file_get_contents($file);
+                $output .= file_get_contents($file);
             }
 
-            $result .= "]";
+            $output .= "]";
             return json_encode([
                 'status' => 'Success',
-                'data'  => $result
+                'data'  => $output
             ]);
         } catch (\Throwable $th) {
             return $this->transaction_failed_error($th->getMessage());
@@ -151,22 +148,25 @@ class sync_controller_mobile_services extends Controller
     public function retrieve_gps($user_code, $date_from, $date_to){
         $period = CarbonPeriod::create(date('Y-m-d', strtotime($date_from)), date('Y-m-d', strtotime($date_to)));
         $date_range = $period->toArray();
+
         $output = '';
         $output .= "[";
         foreach ($date_range as $date_key => $date){
+
             $year = date_format($date, 'Y');
             $month = date_format($date, 'm');
             $day = date_format($date, 'd');
             $dir = "Mobile-Services/".$year."/".$month."/".$day.'/'.$user_code;
             $file = $dir."/services.json";
             if(file_exists($file)){
-                if($date_key !== array_key_first($date_range)){
+
+                if ($output != "[") {
                     $output .= ",\r\n";
                 }
                 $output .= file_get_contents($file);
             }
         }
-        $output .= "]";
+        $output .= "]"; 
 
         return json_decode($output,true);
     }

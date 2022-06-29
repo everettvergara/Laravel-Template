@@ -15,14 +15,14 @@ class ModuleGroupSeeder extends Seeder
      */
     public function run()
     {
-        $existing = tb_sys_mf_mod_group::whereIn('code', ['PR', 'SYS', 'MF', 'TR', 'RP','TL', 'SC', 'CFG'])->get();
+        $existing = tb_sys_mf_mod_group::whereIn('code', ['M', 'SYS', 'MF', 'TR', 'RP','TL', 'SC', 'CFG'])->get();
         $existing_count = $existing->count();
 
         if($existing_count == 0){
             $pr =   tb_sys_mf_mod_group::create([
-                        'code' => 'PR',
-                        'name' => 'PATIENT REGISTRY',
-                        'menu' => 'patient-registry',
+                        'code' => 'M',
+                        'name' => 'MAIN',
+                        'menu' => 'main',
                         'ref_mod_id' => null,
                         'seq' => 1,
                         'is_active' => 1,

@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Schema;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -46,7 +47,7 @@ class AppServiceProvider extends ServiceProvider
         Blade::aliasComponent('components.rowmanager', 'rowmanager');
         Blade::aliasComponent('components.field', 'field');
 
-
+        Schema::defaultStringLength(191);
 
         Blade::aliasComponent('layouts.old_nav', 'oldnav');
         Blade::aliasComponent('layouts.nav', 'nav');
